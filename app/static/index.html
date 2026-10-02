@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinic Bot | Smart Healthcare Assistant</title>
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --panel-bg: rgba(20, 27, 45, 0.75);
+      --panel-border: rgba(255, 255, 255, 0.08);
+      --primary: #3b82f6;
+      --primary-glow: rgba(59, 130, 246, 0.35);
+      --accent-teal: #10b981;
+      --accent-purple: #8b5cf6;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --chat-user-bg: linear-gradient(135deg, #2563eb, #1d4ed8);
+      --chat-bot-bg: rgba(30, 41, 59, 0.9);
+      --chat-bot-border: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.12) 0px, transparent 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    /* Outer Wrapper Container */
+    .app-viewport {
+      width: 100%;
+      max-width: 1080px;
+      height: 92vh;
+      max-height: 850px;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 840px) {
+      .app-viewport {
+        grid-template-columns: 1fr;
+        height: 98vh;
+      }
+      .sidebar {
+        display: none; /* Collapsed on small screens */
+      }
+    }
+
+    /* Glassmorphic Panel Base */
+    .glass-panel {
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      gap: 1.5rem;
+    }
+
+    .brand-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      background: linear-gradient(135deg, #fff, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sidebar-section-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    /* Clinic Details Card */
+    .clinic-info-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 1rem;
+      flex-grow: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+      color: #d1d5db;
+    }
+
+    .info-row i {
+      color: var(--primary);
+      width: 16px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .services-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.25rem;
+    }
+
+    .service-chip {
+      font-size: 0.72rem;
+      padding: 0.2rem 0.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      color: #e5e7eb;
+    }
+
+    /* Phone / Chat Container */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+    }
+
+    /* Phone Top Header Bar */
+    .chat-header {
+      padding: 1rem 1.25rem;
+      background: rgba(15, 23, 42, 0.8);
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .clinic-selector-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex: 1;
+    }
+
+    .clinic-select {
+      background: rgba(30, 41, 59, 0.9);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 0.6rem 1rem;
+      font-size: 0.92rem;
+      font-family: inherit;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+      max-width: 280px;
+    }
+
+    .clinic-select:hover, .clinic-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    .user-session-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 0.4rem 0.75rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .user-session-badge span {
+      color: #60a5fa;
+      font-weight: 600;
+      font-family: monospace;
+    }
+
+    /* New Patient Button */
+    .btn-new-patient {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border: none;
+      padding: 0.55rem 1rem;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+      white-space: nowrap;
+    }
+
+    .btn-new-patient:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-new-patient:active {
+      transform: translateY(0);
+    }
+
+    /* Chat Messages Body */
+    .chat-messages {
+      flex: 1;
+      padding: 1.25rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      scroll-behavior: smooth;
+    }
+
+    /* Custom Scrollbar */
+    .chat-messages::-webkit-scrollbar, .clinic-info-card::-webkit-scrollbar {
+      width: 6px;
+    }
+    .chat-messages::-webkit-scrollbar-thumb, .clinic-info-card::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 999px;
+    }
+
+    /* Phone-style Chat Bubbles */
+    .message-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.6rem;
+      max-width: 80%;
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-row.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message-row.bot {
+      align-self: flex-start;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .avatar.bot-avatar {
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      color: white;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+    }
+
+    .avatar.user-avatar {
+      background: linear-gradient(135deg, #10b981, #14b8a6);
+      color: white;
+    }
+
+    .bubble-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bubble {
+      padding: 0.8rem 1.1rem;
+      border-radius: 18px;
+      font-size: 0.92rem;
+      line-height: 1.45;
+      word-wrap: break-word;
+    }
+
+    .message-row.bot .bubble {
+      background: var(--chat-bot-bg);
+      border: 1px solid var(--chat-bot-border);
+      color: #f3f4f6;
+      border-bottom-left-radius: 4px;
+    }
+
+    .message-row.user .bubble {
+      background: var(--chat-user-bg);
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    }
+
+    /* System Notification Row */
+    .message-row.system {
+      align-self: center;
+      max-width: 90%;
+      margin: 0.5rem 0;
+    }
+
+    .message-row.system .bubble {
+      background: rgba(234, 179, 8, 0.12);
+      border: 1px solid rgba(234, 179, 8, 0.3);
+      color: #fef08a;
+      font-size: 0.82rem;
+      border-radius: 12px;
+      text-align: center;
+      padding: 0.6rem 1rem;
+    }
+
+
+    .timestamp {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+      padding: 0 0.2rem;
+    }
+
+    .message-row.user .timestamp {
+      text-align: right;
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0.75rem 1rem;
+      background: var(--chat-bot-bg);
+      border: 1px solid var(--chat-bot-border);
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+      width: fit-content;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      background: #9ca3af;
+      border-radius: 50%;
+      animation: typingBounce 1.2s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingBounce {
+      0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
+      40% { transform: scale(1.1); opacity: 1; }
+    }
+
+    /* Input Footer Bar */
+    .chat-footer {
+      padding: 1rem 1.25rem;
+      background: rgba(15, 23, 42, 0.85);
+      border-top: 1px solid var(--panel-border);
+    }
+
+    .chat-form {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 0.85rem 1.2rem;
+      color: #ffffff;
+      font-size: 0.92rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .chat-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 12px var(--primary-glow);
+      background: rgba(30, 41, 59, 0.95);
+    }
+
+    .btn-send {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), #2563eb);
+      color: white;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px var(--primary-glow);
+      flex-shrink: 0;
+    }
+
+    .btn-send:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+    }
+
+    .btn-send:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-viewport">
+    <!-- Sidebar: Clinic Info & Details -->
+    <div class="glass-panel sidebar">
+      <div class="brand-header">
+        <div class="brand-icon">
+          <i data-lucide="bot-message-square"></i>
+        </div>
+        <div>
+          <h1 class="brand-title">Clinic Bot</h1>
+          <span style="font-size: 0.72rem; color: var(--text-muted);">Smart Health Assistant</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Selected Clinic Details</div>
+        <div class="clinic-info-card" id="clinicInfoCard">
+          <div style="font-weight: 600; font-size: 1rem; color: #fff;" id="infoName">Loading...</div>
+          <span class="badge" id="infoCategory">-</span>
+          
+          <div class="info-row">
+            <i data-lucide="map-pin"></i>
+            <span id="infoAddress">-</span>
+          </div>
+          <div class="info-row">
+            <i data-lucide="phone"></i>
+            <span id="infoPhone">-</span>
+          </div>
+          <div class="info-row">
+            <i data-lucide="clock"></i>
+            <span id="infoHours">-</span>
+          </div>
+
+          <div style="margin-top: 0.5rem; font-size: 0.78rem; font-weight: 600; color: #9ca3af;">Available Services</div>
+          <div class="services-list" id="infoServices">
+            <!-- Dynamically populated -->
+          </div>
+
+          <div style="margin-top: 0.5rem; font-size: 0.78rem; font-weight: 600; color: #9ca3af;">Doctors</div>
+          <div id="infoDoctors" style="font-size: 0.8rem; color: #d1d5db; display: flex; flex-direction: column; gap: 0.3rem;">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Chat Window -->
+    <div class="glass-panel chat-container">
+      <!-- Header -->
+      <div class="chat-header">
+        <div class="clinic-selector-group">
+          <i data-lucide="building-2" style="color: var(--primary); width: 20px;"></i>
+          <select id="clinicSelect" class="clinic-select" onchange="onClinicChange()">
+            <!-- Options populated dynamically -->
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div class="user-session-badge">
+            <i data-lucide="user" style="width: 14px; color: #60a5fa;"></i>
+            ID: <span id="userIdDisplay">...</span>
+          </div>
+          <button class="btn-new-patient" onclick="resetNewPatient()">
+            <i data-lucide="user-plus" style="width: 15px;"></i>
+            New Patient
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages Area -->
+      <div class="chat-messages" id="chatMessages">
+        <!-- Messages appended dynamically -->
+      </div>
+
+      <!-- Footer Form -->
+      <div class="chat-footer">
+        <form class="chat-form" id="chatForm" onsubmit="handleSend(event)">
+          <input 
+            type="text" 
+            id="messageInput" 
+            class="chat-input" 
+            placeholder="Type your query here..." 
+            autocomplete="off"
+            required
+          />
+          <button type="submit" id="sendBtn" class="btn-send">
+            <i data-lucide="send" style="width: 18px;"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State management
+    let clinicsList = [];
+    let currentClinicId = 'glow-skin';
+    let currentUserId = getOrCreateUserId();
+
+    function getOrCreateUserId() {
+      let uid = localStorage.getItem('clinic_bot_user_id');
+      if (!uid) {
+        uid = generateNewUserId();
+        localStorage.setItem('clinic_bot_user_id', uid);
+      }
+      return uid;
+    }
+
+    function generateNewUserId() {
+      const randStr = Math.random().toString(36).substring(2, 8);
+      return `pat_${randStr}`;
+    }
+
+    function resetNewPatient() {
+      currentUserId = generateNewUserId();
+      localStorage.setItem('clinic_bot_user_id', currentUserId);
+      updateUserIdDisplay();
+      
+      // Clear message view and display welcome greeting
+      const messagesContainer = document.getElementById('chatMessages');
+      messagesContainer.innerHTML = '';
+      
+      const currentClinic = clinicsList.find(c => c.id === currentClinicId);
+      const clinicName = currentClinic ? currentClinic.name : 'our clinic';
+      
+      appendMessage('bot', `Hello! Welcome to ${clinicName}. I am your virtual assistant. How can I help you today?`);
+    }
+
+    function updateUserIdDisplay() {
+      document.getElementById('userIdDisplay').textContent = currentUserId;
+    }
+
+    async function loadClinics() {
+      try {
+        const response = await fetch('/api/clinics');
+        clinicsList = await response.json();
+        
+        const selectEl = document.getElementById('clinicSelect');
+        selectEl.innerHTML = '';
+
+        clinicsList.forEach(clinic => {
+          const opt = document.createElement('option');
+          opt.value = clinic.id;
+          opt.textContent = clinic.name;
+          selectEl.appendChild(opt);
+        });
+
+        if (clinicsList.length > 0) {
+          currentClinicId = clinicsList[0].id;
+          selectEl.value = currentClinicId;
+          updateClinicSidebar(clinicsList[0]);
+        }
+      } catch (err) {
+        console.error('Failed to load clinics:', err);
+      }
+    }
+
+    function updateClinicSidebar(clinic) {
+      if (!clinic) return;
+      document.getElementById('infoName').textContent = clinic.name;
+      document.getElementById('infoCategory').textContent = clinic.category || 'Clinic';
+      document.getElementById('infoAddress').textContent = clinic.address || `${clinic.city}`;
+      document.getElementById('infoPhone').textContent = clinic.phone || 'N/A';
+      
+      const hours = clinic.opening_hours ? 
+        (clinic.opening_hours.monday_to_friday || clinic.opening_hours.monday_friday || 'Regular Hours') 
+        : 'Open daily';
+      document.getElementById('infoHours').textContent = hours;
+
+      const servicesEl = document.getElementById('infoServices');
+      servicesEl.innerHTML = '';
+      if (clinic.services && clinic.services.length) {
+        clinic.services.forEach(s => {
+          const chip = document.createElement('span');
+          chip.className = 'service-chip';
+          chip.textContent = `${s.name} (₹${s.price_inr})`;
+          servicesEl.appendChild(chip);
+        });
+      } else {
+        servicesEl.textContent = 'Standard medical services';
+      }
+
+      const docsEl = document.getElementById('infoDoctors');
+      docsEl.innerHTML = '';
+      if (clinic.doctors && clinic.doctors.length) {
+        clinic.doctors.forEach(d => {
+          const dItem = document.createElement('div');
+          dItem.style.display = 'flex';
+          dItem.style.alignItems = 'center';
+          dItem.style.gap = '0.4rem';
+          dItem.innerHTML = `<i data-lucide="user-check" style="width: 14px; color: var(--accent-teal);"></i> ${d.name} <span style="font-size: 0.7rem; color: #9ca3af;">(${d.specialization})</span>`;
+          docsEl.appendChild(dItem);
+        });
+        lucide.createIcons();
+      }
+    }
+
+    function onClinicChange() {
+      const selectEl = document.getElementById('clinicSelect');
+      currentClinicId = selectEl.value;
+      const clinic = clinicsList.find(c => c.id === currentClinicId);
+      updateClinicSidebar(clinic);
+      
+      // Load or restart chat for this clinic
+      loadChatHistory();
+    }
+
+    async function loadChatHistory() {
+      const messagesContainer = document.getElementById('chatMessages');
+      messagesContainer.innerHTML = '';
+
+      try {
+        const res = await fetch(`/api/conversations/${currentUserId}/${currentClinicId}`);
+        const history = await res.json();
+
+        if (history && history.length > 0) {
+          history.forEach(msg => {
+            appendMessage(msg.sender, msg.message, msg.timestamp);
+          });
+        } else {
+          const currentClinic = clinicsList.find(c => c.id === currentClinicId);
+          const clinicName = currentClinic ? currentClinic.name : 'our clinic';
+          appendMessage('bot', `Hello! Welcome to ${clinicName}. How can I assist you today?`);
+        }
+      } catch (e) {
+        console.error('Error fetching chat history:', e);
+      }
+    }
+
+    function appendMessage(sender, text, timestampStr = null) {
+      const container = document.getElementById('chatMessages');
+      const time = timestampStr ? new Date(timestampStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      const row = document.createElement('div');
+      row.className = `message-row ${sender}`;
+
+      if (sender === 'system') {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.innerHTML = `<i data-lucide="bell" style="width: 14px; vertical-align: middle; margin-right: 4px;"></i> ${text}`;
+        row.appendChild(bubble);
+      } else {
+        const avatar = document.createElement('div');
+        avatar.className = `avatar ${sender === 'bot' ? 'bot-avatar' : 'user-avatar'}`;
+        avatar.innerHTML = sender === 'bot' ? '<i data-lucide="bot" style="width: 18px;"></i>' : '<i data-lucide="user" style="width: 18px;"></i>';
+
+        const bubbleWrapper = document.createElement('div');
+        bubbleWrapper.className = 'bubble-wrapper';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.textContent = text;
+
+        const timeEl = document.createElement('div');
+        timeEl.className = 'timestamp';
+        timeEl.textContent = time;
+
+        bubbleWrapper.appendChild(bubble);
+        bubbleWrapper.appendChild(timeEl);
+
+        row.appendChild(avatar);
+        row.appendChild(bubbleWrapper);
+      }
+
+      container.appendChild(row);
+      container.scrollTop = container.scrollHeight;
+      lucide.createIcons();
+    }
+
+
+    function showTypingIndicator() {
+      const container = document.getElementById('chatMessages');
+      const indicator = document.createElement('div');
+      indicator.id = 'typingIndicatorRow';
+      indicator.className = 'message-row bot';
+      indicator.innerHTML = `
+        <div class="avatar bot-avatar"><i data-lucide="bot" style="width: 18px;"></i></div>
+        <div class="typing-indicator">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      `;
+      container.appendChild(indicator);
+      container.scrollTop = container.scrollHeight;
+      lucide.createIcons();
+    }
+
+    function hideTypingIndicator() {
+      const el = document.getElementById('typingIndicatorRow');
+      if (el) el.remove();
+    }
+
+    async function handleSend(event) {
+      event.preventDefault();
+      const input = document.getElementById('messageInput');
+      const sendBtn = document.getElementById('sendBtn');
+      const text = input.value.trim();
+      if (!text) return;
+
+      // Add user message to UI
+      appendMessage('user', text);
+      input.value = '';
+      input.disabled = true;
+      sendBtn.disabled = true;
+
+      // Show typing indicator
+      showTypingIndicator();
+
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clinic_id: currentClinicId,
+            user_id: currentUserId,
+            message: text
+          })
+        });
+
+        const data = await response.json();
+        hideTypingIndicator();
+
+        if (data.reply) {
+          appendMessage('bot', data.reply, data.timestamp);
+        } else {
+          appendMessage('bot', 'Sorry, I did not receive a response.');
+        }
+      } catch (error) {
+        console.error('Chat API Error:', error);
+        hideTypingIndicator();
+        appendMessage('bot', 'An error occurred while connecting to the clinic server. Please try again.');
+      } finally {
+        input.disabled = false;
+        sendBtn.disabled = false;
+        input.focus();
+      }
+    }
+
+    // Init
+    window.addEventListener('DOMContentLoaded', async () => {
+      updateUserIdDisplay();
+      await loadClinics();
+      await loadChatHistory();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+{
+  "clinics": [
+    {
+      "id": "glow-skin",
+      "name": "Glow Skin Clinic",
+      "category": "Dermatology & Skin Care",
+      "city": "Mumbai",
+      "address": "102 Lotus Heights, Hill Road, Bandra West, Mumbai, Maharashtra 400050",
+      "phone": "+91 98765 43210",
+      "email": "contact@glowskin.in",
+      "opening_hours": {
+        "monday_to_friday": "09:00 AM - 08:00 PM",
+        "saturday": "10:00 AM - 06:00 PM",
+        "sunday": "Closed"
+      },
+      "doctors": [
+        {
+          "id": "doc-01",
+          "name": "Dr. Ananya Sharma",
+          "specialization": "Dermatologist & Aesthetic Physician",
+          "qualification": "MD Dermatology, MBBS",
+          "experience_years": 12
+        },
+        {
+          "id": "doc-02",
+          "name": "Dr. Rohan Mehta",
+          "specialization": "Trichologist & Laser Specialist",
+          "qualification": "DVD, MBBS",
+          "experience_years": 8
+        }
+      ],
+      "services": [
+        {
+          "id": "srv-acne",
+          "name": "Acne Treatment",
+          "description": "Medical acne consultation, extraction, and targeted chemical formulation.",
+          "price_inr": 1500
+        },
+        {
+          "id": "srv-peels",
+          "name": "Chemical Peels",
+          "description": "Dermatological exfoliation peels for hyperpigmentation and tone brightening.",
+          "price_inr": 2500
+        },
+        {
+          "id": "srv-laser",
+          "name": "Laser Hair Removal",
+          "description": "Advanced triple-wavelength diode laser hair reduction therapy.",
+          "price_inr": 4000
+        },
+        {
+          "id": "srv-hydra",
+          "name": "Hydrafacial",
+          "description": "Deep medical-grade skin cleansing, extraction, and serum hydration.",
+          "price_inr": 3500
+        }
+      ]
+    },
+    {
+      "id": "bright-dental",
+      "name": "Bright Dental Care",
+      "category": "Dental & Oral Health",
+      "city": "Mumbai",
+      "address": "405 Sunbeam Plaza, SV Road, Andheri West, Mumbai, Maharashtra 400053",
+      "phone": "+91 98765 12345",
+      "email": "info@brightdental.in",
+      "opening_hours": {
+        "monday_to_friday": "09:30 AM - 08:30 PM",
+        "saturday": "10:00 AM - 07:00 PM",
+        "sunday": "10:00 AM - 02:00 PM"
+      },
+      "doctors": [
+        {
+          "id": "doc-03",
+          "name": "Dr. Priya Nair",
+          "specialization": "Endodontist & Cosmetic Dentist",
+          "qualification": "MDS Endodontics, BDS",
+          "experience_years": 10
+        },
+        {
+          "id": "doc-04",
+          "name": "Dr. Vikram Kulkarni",
+          "specialization": "Orthodontist",
+          "qualification": "MDS Orthodontics, BDS",
+          "experience_years": 14
+        }
+      ],
+      "services": [
+        {
+          "id": "srv-cleaning",
+          "name": "Dental Cleaning",
+          "description": "Professional ultrasonic plaque scaling and tooth polishing.",
+          "price_inr": 1200
+        },
+        {
+          "id": "srv-root-canal",
+          "name": "Root Canal Treatment",
+          "description": "Single-visit endodontic therapy with painless localized anesthesia.",
+          "price_inr": 5500
+        },
+        {
+          "id": "srv-braces",
+          "name": "Braces & Aligners",
+          "description": "Metal, ceramic, or invisible clear aligner orthodontic treatments.",
+          "price_inr": 35000
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+# Environment variables
+.env
+
+# Database files
+*.db
+*.sqlite3
+
+# Python virtual environment & cache
+.venv/
+env/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.swp
+.DS_Store

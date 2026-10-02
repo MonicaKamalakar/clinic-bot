@@ -1,0 +1,1 @@
+"""Clinic Bot application package."""
